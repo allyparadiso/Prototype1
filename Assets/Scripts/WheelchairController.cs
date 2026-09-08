@@ -1,18 +1,14 @@
-using Unity.Burst.CompilerServices;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering;
-using UnityEngine.Windows;
 
 public class WheelchairController : MonoBehaviour
 {
     [Header("Wheelchair Settings")]
-    public float acceleration = 2000f;
-    public float deceleration = 500f;
+    public float motorTorque = 2000f;
+    public float brakeTorque = 500f;
     public float maxSpeed = 20f;
-    public float steeringRange = 360;
-    public float steeringRangeAtMaxSpeed = 240f;
+    public float steeringRange = 90;
+    public float steeringRangeAtMaxSpeed = 45;
     public float centerOfGravityOffset = -1f;
 
     private WheelControl[] wheels;
@@ -20,11 +16,6 @@ public class WheelchairController : MonoBehaviour
 
     private WheelchairInputActions controls;
     private Vector2 _inputVector;
-    private float moveInput;
-    private float steerInput;
-    private float currentSpeed;
-    private float currentSteerRange;
-    private float currentAcceleration;
 
     private void Awake()
     {
@@ -59,56 +50,10 @@ public class WheelchairController : MonoBehaviour
 
     private void Update()
     {
-        bool isAccelerating = Mathf.Sign(moveInput) == Mathf.Sign(currentSpeed);
-
-        foreach (var wheel in wheels)
-        {
-            if (wheel.steerable)
-            {
-                wheel.wheelCollider.steerAngle = steerInput * currentSteerRange;
-            }
-
-            if (isAccelerating)
-            {
-                if (wheel.motorized)
-                {
-                    wheel.wheelCollider.motorTorque = moveInput * currentSpeed;
-                }
-
-                wheel.wheelCollider.brakeTorque = 0f;
-            }
-            else
-            {
-                wheel.wheelCollider.motorTorque = 0f;
-                //wheel.wheelCollider.brakeTorque = Mathf.Abs(vInput) * brakeTorque;
-            }
-        }
+        
     }
 
-    public void Movement()
-    {
-        moveInput = _inputVector.y;
-
-        if (Mathf.Abs(moveInput) > 0.01f)
-        {
-            currentSpeed += moveInput * acceleration * Time.deltaTime;
-        }
-        else
-        {
-            currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, deceleration * Time.deltaTime);
-        }
-
-        currentSpeed = Mathf.Clamp(currentSpeed, -maxSpeed * 0.5f, maxSpeed);
-
-        transform.Translate(Vector3.forward * currentSpeed * Time.deltaTime);
-    }
-
-    public void Steering()
-    {
-        steerInput = _inputVector.x;
-    }
-
-    /*private void FixedUpdate()
+    private void FixedUpdate()
     {
         float vInput = _inputVector.y;
         float hInput = _inputVector.x;
@@ -144,5 +89,5 @@ public class WheelchairController : MonoBehaviour
                 wheel.wheelCollider.brakeTorque = Mathf.Abs(vInput) * brakeTorque;
             }
         }
-    }*/
+    }
 }
