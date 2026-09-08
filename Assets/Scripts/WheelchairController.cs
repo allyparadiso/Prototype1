@@ -34,6 +34,9 @@ public class WheelchairController : MonoBehaviour
 
     private void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         rb = GetComponent<Rigidbody>();
 
         Vector3 centerOfMass = rb.centerOfMass;
